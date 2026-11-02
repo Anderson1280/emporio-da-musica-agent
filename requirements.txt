@@ -1,0 +1,8 @@
+# Dependências do agente (Python 3.10+)
+openai>=1.60,<2          # SDK oficial (chat + function calling + embeddings)
+pandas>=2.0              # carga e consulta dos CSVs da operação
+pypdf>=4.0               # extração de texto do Manual de Políticas (PDF)
+rich>=13.0               # interface de chat no terminal
+
+# Desenvolvimento
+pytest>=8.0

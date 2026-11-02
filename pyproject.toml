@@ -1,0 +1,19 @@
+[project]
+name = "emporio-da-musica-agent"
+version = "1.0.0"
+description = "Agente de atendimento da Empório da Música (Desafio Técnico AI Engineer 2026)"
+requires-python = ">=3.10"
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "SIM", "PIE", "B", "BLE", "S"]
+# BLE001/S110: capturar Exception de forma ampla é proposital nas bordas do agente
+# (chamadas de LLM/rede/embeddings precisam de degradação graciosa, não de crash).
+# S101: assert é usado nas suítes de teste (padrão do pytest).
+ignore = ["BLE001", "S110", "S101"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
