@@ -1,0 +1,5 @@
+# Cenário 01 — Consulta ao catálogo de produtos
+# Como reproduzir: python -m emporio_agent --demo examples/demo_messages/01_catalogo.txt
+Oi! Quais opções de violões disponíveis custando até R$1000?
+O mais barato deles me pareceu uma boa pra começar. Pode me passar os detalhes dele?
+E vocês têm em quantas unidades?

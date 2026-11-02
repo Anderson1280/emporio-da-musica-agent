@@ -1,0 +1,5 @@
+# Cenário 02 — Consulta de preço e promoções
+# Como reproduzir: python -m emporio_agent --demo examples/demo_messages/02_preco_promocao.txt
+Quanto custa o Takamine GD20?
+Tem alguma promoção ativa na loja?
+Pagando no PIX esse violão fica com desconto também?

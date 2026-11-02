@@ -1,0 +1,6 @@
+# Cenário 03 — Status de pedido (situação não trivial: dados em tempo real + política de rastreio)
+# Como reproduzir: python -m emporio_agent --demo examples/demo_messages/03_status_pedido.txt
+Boa tarde! Eu fiz uma compra semana passada e ainda não recebi nada, cadê meu pedido?
+Meu telefone é (67) 99654-7821
+E como eu uso esse código de rastreio?
+Quanto tempo de garantia o produto comprado tem?

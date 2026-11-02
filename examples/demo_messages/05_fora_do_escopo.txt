@@ -1,0 +1,5 @@
+# Cenário 05 — Fora do escopo (acessórios e assunto aleatório)
+# Como reproduzir: python -m emporio_agent --demo examples/demo_messages/05_fora_do_escopo.txt
+Vocês têm palhetas, cabos e pedal de distorção?
+Ah, entendi. Aproveitando: quanto tá o dólar hoje?
+Ok, obrigado! Você sabe me dizer qual o endereço da loja?
