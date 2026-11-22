@@ -22,15 +22,39 @@ from .config import Settings
 from .policies import PolicyChunk
 
 _TOKEN_RE = re.compile(r"[a-zà-ú0-9]+")
+_BOOST_SECTION = 3  # repetição dos termos do título da seção no índice
+_BOOST_PARENT = 2   # repetição dos termos da seção-pai (breadcrumb) no índice
+
+# Expansão de consulta (query expansion): mapeia palavras do cliente para os
+# termos usados no manual. Necessário porque o português alterna consoantes
+# na família "devolver/devolução" (v<->u), que o prefixo de 5 letras não cobre.
+_EXPANSAO_CONSULTA = {
+    "devolver": ["devolução", "devoluções", "devol"],
+    "devolvo": ["devolução", "devoluções", "devol"],
+    "devolução": ["devol"],
+    "trocar": ["troca", "trocas"],
+    "frete": ["entrega", "entregas"],
+    "entrega": ["frete", "entregas"],
+    "rastrear": ["rastreamento", "rastreio"],
+    "rastreio": ["rastreamento"],
+    "reembolso": ["estorno", "reembolsado"],
+    "cancelar": ["cancelamento"],
+    "pagar": ["pagamento", "pagamentos"],
+    "comprar": ["compra", "compras"],
+    "horário": ["horários"],
+    "aberto": ["funcionamento"],
+}
 
 
 def _tokenize(text: str) -> list[str]:
     """
     Tokenização com truncamento leve (stemming por prefixo):
-    além das palavras completas, indexa o radical de 5 caracteres das
-    palavras longas. Assim, "devolver" e "devolução" (radical "devol")
-    se casam, cobrindo as flexões comuns do português sem um stemmer
-    completo — mais que suficiente para este corpus.
+    além das palavras completas, indexa os radicais de 5 e 4 caracteres das
+    palavras longas. O radical de 4 letras cobre flexões irregulares do
+    português em que a consoante muda ("devolver" -> "devo", "devolução" ->
+    "devo"), enquanto o de 5 mantém precisão para as regulares ("garantia" ->
+    "garan"). Termos ubíquos que o radical curto trouxer são penalizados
+    naturalmente pelo IDF do BM25.
     """
     tokens: list[str] = []
     for word in _TOKEN_RE.findall(text.lower()):
@@ -38,7 +62,20 @@ def _tokenize(text: str) -> list[str]:
             tokens.append(word)
         if len(word) >= 6:
             tokens.append(word[:5])
+            tokens.append(word[:4])
     return tokens
+
+
+def _expandir_consulta(query: str) -> list[str]:
+    """Adiciona à consulta os termos equivalentes usados no manual (dedup)."""
+    base = _tokenize(query)
+    extras = [exp for tok in base for exp in _EXPANSAO_CONSULTA.get(tok, [])]
+    vistos = set(base)
+    for extra in extras:
+        if extra not in vistos:
+            base.append(extra)
+            vistos.add(extra)
+    return base
 
 
 class BM25Index:
@@ -52,7 +89,15 @@ class BM25Index:
     def __init__(self, chunks: list[PolicyChunk], k1: float = 1.5, b: float = 0.75) -> None:
         self.k1, self.b = k1, b
         self.chunks = chunks
-        self.docs_tokens = [_tokenize(c.as_text()) for c in chunks]
+        # Field boost: o título define o tópico da seção e o breadcrumb do pai
+        # indica o tema geral, então recebem peso maior que o corpo do texto.
+        # (versão simplificada do BM25F: repetir os termos do campo no índice)
+        self.docs_tokens = [
+            _tokenize(c.as_text())
+            + _tokenize(c.section) * _BOOST_SECTION
+            + _tokenize(c.parent) * _BOOST_PARENT
+            for c in chunks
+        ]
         self.doc_len = [len(t) for t in self.docs_tokens]
         self.avg_len = sum(self.doc_len) / max(len(self.doc_len), 1)
         self.doc_freq: Counter = Counter()
@@ -66,7 +111,7 @@ class BM25Index:
         return math.log(1 + (self.n_docs - df + 0.5) / (df + 0.5))
 
     def search(self, query: str, top_k: int = 4) -> list[tuple[PolicyChunk, float]]:
-        q_tokens = _tokenize(query)
+        q_tokens = _expandir_consulta(query)
         scores = []
         for idx, tokens in enumerate(self.docs_tokens):
             freq = Counter(tokens)

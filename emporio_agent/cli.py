@@ -9,18 +9,35 @@ Execução:
 from __future__ import annotations
 
 import argparse
+import contextlib
 import sys
 from pathlib import Path
 
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
-from rich.rule import Rule
 
 from .agent import create_agent
 from .persona import STORE_NAME, STORE_SLOGAN
 
+# Terminais Windows com codepage antiga (ex.: cp850/cp1252 no PyCharm) podem não
+# representar caracteres de desenho/emoji; degradamos para "?" em vez de quebrar.
+for _stream in (sys.stdout, sys.stderr):
+    with contextlib.suppress(AttributeError, ValueError):  # stream sem reconfigure
+        _stream.reconfigure(errors="replace")
+
 console = Console()
+
+
+def _regua() -> None:
+    """Separador que degrada para ASCII se o terminal não suportar '─'."""
+    try:
+        "─".encode(sys.stdout.encoding or "ascii")
+    except (LookupError, UnicodeEncodeError):
+        console.print("[dim]" + "-" * console.width + "[/dim]")
+        return
+    console.rule(style="dim")
+
 
 BANNER = f"""
 [bold magenta]{STORE_NAME}[/bold magenta] — Atendimento Virtual
@@ -49,7 +66,7 @@ def _run_interactive() -> None:
         f'[green]Assistente:[/green] Olá! Bem-vindo à {STORE_NAME}, como posso ajudar?'
     )
     console.print(HELP_TEXT)
-    console.print(Rule(dim=True))
+    _regua()
 
     while True:
         try:
