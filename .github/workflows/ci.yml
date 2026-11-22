@@ -29,4 +29,6 @@ jobs:
           # Garante que nenhum teste tente chamar a API real
           OPENAI_API_KEY: ""
           ENABLE_EMBEDDINGS: "false"
-        run: pytest tests/ -v
+        # python -m pytest adiciona a raiz do projeto ao sys.path, tornando o
+        # pacote `emporio_agent` importável pelo conftest (pytest puro não faz isso).
+        run: python -m pytest tests/ -v
