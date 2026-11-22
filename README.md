@@ -1,4 +1,5 @@
 # Empório da Música — Agente de Atendimento
+[![CI](https://github.com/Anderson1280/emporio-da-musica-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Anderson1280/emporio-da-musica-agent/actions/workflows/ci.yml)
 
 **Desafio Técnico — AI Engineer (Artefact, 2026) · Protótipo de agente de atendimento por mensagens de texto**
 
