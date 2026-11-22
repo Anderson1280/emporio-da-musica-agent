@@ -35,6 +35,13 @@ source .venv/bin/activate        # Linux/macOS
 pip install -r requirements.txt
 ```
 
+> **Nota sobre versões:** as faixas do `requirements.txt` são
+> deliberadamente conservadoras (ex.: `numpy<2.3`). Versões recém-lançadas
+> quebraram em Windows recém-configurado — numpy 2.5.x falha ao carregar a
+> DLL C (`ImportError: DLL load failed ... _multiarray_umath`) e rich 15
+> removeu parâmetros antigos. Os limites superiores garantem um conjunto
+> maduro e testado em qualquer máquina.
+
 ### 3. Configuração do ambiente
 
 ```bash
@@ -187,8 +194,13 @@ no mesmo chunk, o que é crítico para respostas corretas.
 Sobre os chunks rodam **duas estratégias combinadas**:
 
 - **BM25 léxico** (implementação própria, ~40 linhas): determinístico, custo zero,
-  offline. Com truncamento leve de termos (radical de 5 caracteres) cobre flexões do
-  português ("devolver" ↔ "devolução").
+  offline. Três reforços léxicos para o português: (a) truncamento de termos por
+  radical de 5 e 4 caracteres — o de 4 cobre flexões irregulares em que a consoante
+  muda ("devolver"/"devolução" compartilham a raiz "devo"); (b) **expansão de
+  consulta**, um pequeno mapa de sinônimos que liga o vocabulário do cliente ao
+  vocabulário do manual ("frete" → "entrega", "reembolso" → "estorno"); (c) **field
+  boost** simplificado (estilo BM25F): termos do título da seção e do breadcrumb da
+  seção-pai recebem peso maior que o corpo do texto.
 - **Embeddings** (`text-embedding-3-small`): capturam paráfrase que o léxico perde
   ("cadê meu pedido" ↔ "rastreamento"). Com cache em disco (`.cache/`) para não
   recomputar.

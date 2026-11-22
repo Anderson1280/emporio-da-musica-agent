@@ -1,8 +1,14 @@
 # Dependências do agente (Python 3.10+)
+#
+# Faixas deliberadamente conservadoras: versões recém-lançadas quebraram em
+# Windows recém-configurado (numpy 2.5.x falha ao carregar a DLL C — erro 1114 —
+# e rich 15 removeu parâmetros usados por versões anteriores). Os limites
+# superiores garantem que `pip install` caia em versões maduras e testadas.
 openai>=1.60,<2          # SDK oficial (chat + function calling + embeddings)
-pandas>=2.0              # carga e consulta dos CSVs da operação
-pypdf>=4.0               # extração de texto do Manual de Políticas (PDF)
-rich>=13.0               # interface de chat no terminal
+pandas>=2.2,<3           # carga e consulta dos CSVs (linha 2.3.x, estável)
+numpy>=2.0.2,<2.3        # 2.3+ falhou com erro de DLL em alguns Windows
+pypdf>=5.0,<7            # extração de texto do PDF (modo "layout" exige >=5)
+rich>=13.0,<16           # interface de chat no terminal
 
 # Desenvolvimento
-pytest>=8.0
+pytest>=8.0,<10
