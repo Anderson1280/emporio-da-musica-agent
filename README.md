@@ -1,6 +1,8 @@
 # Empório da Música — Agente de Atendimento
 [![CI](https://github.com/Anderson1280/emporio-da-musica-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Anderson1280/emporio-da-musica-agent/actions/workflows/ci.yml)
 
+> **English summary:** A customer-service AI agent (Python CLI) for Empório da Música, a Brazilian music-instrument store: OpenAI function calling answers product, order and pricing questions from CSV data, while a hybrid RAG pipeline (BM25 + embeddings fused by reciprocal rank fusion) grounds answers in the store's policy manual (PDF). The repo ships 22 offline pytest tests, ruff linting and GitHub Actions CI; Dependabot reports zero vulnerabilities. Full documentation in Portuguese below.
+
 **Desafio Técnico — AI Engineer (Artefact, 2026) · Protótipo de agente de atendimento por mensagens de texto**
 
 > *Sua música começa aqui.* 🎸
